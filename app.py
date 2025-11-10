@@ -9,14 +9,15 @@ import logging
 import os
 from bot import process_message as bot_process_message
 
+
 # ------------------------
 #  Config
 # ------------------------
 app = Flask(__name__, template_folder="templates", static_folder="static")
 # In production, read secret from env var and keep it private
-JWT_SECRET = os.environ.get("JWT_SECRET", "dev-please-change-this")
+JWT_SECRET = "a8c29b77b9f5416db0aef47efb7f24d1b5c6ab8d3a9c97b44151c0df412a54b0"
 JWT_ALGORITHM = "HS256"
-JWT_EXP_MINUTES = 60  # token lifetime
+
 
 DB_PATH = "solar_crm.db"   # your sqlite file
 
@@ -25,6 +26,33 @@ os.makedirs("logs", exist_ok=True)
 logging.basicConfig(filename="logs/queries.log", level=logging.INFO,
                     format="%(asctime)s %(levelname)s %(message)s")
 
+# Ensure database exists at startup
+try:
+    from crm_database import create_database
+except Exception:
+    create_database = None
+
+def ensure_db():
+    if not os.path.exists(DB_PATH):
+        logging.info("Database file %s not found; creating...", DB_PATH)
+        if create_database:
+            try:
+                create_database(DB_PATH)
+                logging.info("Database created successfully.")
+            except Exception as e:
+                logging.exception("Failed to create DB via crm_database.create_database(): %s", e)
+                raise
+        else:
+            try:
+                conn = sqlite3.connect(DB_PATH)
+                conn.close()
+                logging.info("Created empty sqlite file %s (no schema).", DB_PATH)
+            except Exception as e:
+                logging.exception("Failed to create empty DB file %s: %s", DB_PATH, e)
+                raise
+
+# Run this check at startup
+ensure_db()
 # ------------------------
 #  Helpers
 # ------------------------
@@ -35,25 +63,27 @@ def get_db_connection():
     return conn
 
 def generate_jwt(payload: dict) -> str:
-    """Create JWT with expiry (centralized function)."""
-    expiry = datetime.utcnow() + timedelta(minutes=JWT_EXP_MINUTES)
+    """
+    Create a JWT WITHOUT an 'exp' claim. Token will remain valid
+    until the cookie is cleared on logout (or secret is rotated).
+    """
     payload_to_encode = payload.copy()
-    payload_to_encode.update({"exp": expiry})
     token = jwt.encode(payload_to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
-    # PyJWT >=2 returns str, older versions return bytes
     if isinstance(token, bytes):
         token = token.decode("utf-8")
     return token
 
+
 def verify_jwt(token: str):
-    """Verify and return payload or None if invalid/expired."""
+    """Verify JWT signature and return payload or None if invalid."""
     try:
-        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        # decode and verify signature; do NOT check expiry (we didn't set one)
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM], options={"verify_exp": False})
         return payload
-    except jwt.ExpiredSignatureError:
-        return None
     except jwt.InvalidTokenError:
         return None
+
+
 
 def login_required(view_func):
     """Decorator to protect routes that require a valid JWT cookie."""
@@ -182,36 +212,11 @@ def api_message():
     return jsonify(result), status
 
 
-@app.route("/logout", methods=["POST", "GET"])
+@app.route("/logout", methods=["POST"])
 def logout():
-    """Clear cookie and revoke access token (by jti)."""
-    token = request.cookies.get("access_token")
-    # clear cookie in response
+    """Clear cookie to log the user out (no server-side revocation)."""
     resp = make_response(redirect(url_for("login")))
     resp.set_cookie("access_token", "", expires=0, httponly=True, samesite="Lax", secure=False)
-
-    if token:
-        # attempt to decode token without verification of expiry to extract jti safely
-        try:
-            # verify signature but ignore expiration? we'll try normal decode first
-            payload = verify_jwt(token)
-            if payload and payload.get("jti"):
-                jti = payload["jti"]
-            else:
-                # try decode without expiration to get jti if expired (optional)
-                payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM], options={"verify_exp": False})
-                jti = payload.get("jti")
-        except Exception:
-            jti = None
-
-        if jti:
-            try:
-                conn = get_db_connection()
-                conn.execute("INSERT OR IGNORE INTO revoked_tokens (jti) VALUES (?)", (jti,))
-                conn.commit()
-            finally:
-                conn.close()
-
     return resp
 
 # ------------------------
