@@ -1,5 +1,6 @@
-Flask==2.3.4
-bcrypt==4.1.0
-PyJWT==2.9.0
-python-dotenv==1.0.0
-gunicorn==21.2.0
+Flask
+bcrypt
+PyJWT
+python-dotenv
+gunicorn
+
