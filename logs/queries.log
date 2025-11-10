@@ -719,3 +719,21 @@ sqlite3.ProgrammingError: Incorrect number of bindings supplied. The current sta
 2025-11-10 11:45:19,286 INFO Reply to user 1: No orders found for customer matching 'Hello world'.
 2025-11-10 11:45:19,286 INFO Reply to user 1: No orders found for customer matching 'Hello world'.
 2025-11-10 11:45:19,287 INFO 127.0.0.1 - - [10/Nov/2025 11:45:19] "POST /api/message HTTP/1.1" 200 -
+2025-11-10 14:40:51,256 INFO [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-11-10 14:40:51,256 INFO [33mPress CTRL+C to quit[0m
+2025-11-10 14:40:51,266 INFO  * Restarting with stat
+2025-11-10 14:40:52,579 WARNING  * Debugger is active!
+2025-11-10 14:40:52,586 INFO  * Debugger PIN: 591-117-194
+2025-11-10 14:40:52,621 INFO 127.0.0.1 - - [10/Nov/2025 14:40:52] "[32mGET /chat HTTP/1.1[0m" 302 -
+2025-11-10 14:40:52,664 INFO 127.0.0.1 - - [10/Nov/2025 14:40:52] "GET / HTTP/1.1" 200 -
+2025-11-10 14:41:12,705 INFO Login success for alice@example.com
+2025-11-10 14:41:12,706 INFO 127.0.0.1 - - [10/Nov/2025 14:41:12] "[32mPOST / HTTP/1.1[0m" 302 -
+2025-11-10 14:41:12,791 INFO 127.0.0.1 - - [10/Nov/2025 14:41:12] "GET /chat HTTP/1.1" 200 -
+2025-11-10 14:41:14,464 INFO 127.0.0.1 - - [10/Nov/2025 14:41:14] "[32mPOST /logout HTTP/1.1[0m" 302 -
+2025-11-10 14:41:14,470 INFO 127.0.0.1 - - [10/Nov/2025 14:41:14] "GET / HTTP/1.1" 200 -
+2025-11-10 14:41:57,209 INFO Login success for bob@example.com
+2025-11-10 14:41:57,209 INFO 127.0.0.1 - - [10/Nov/2025 14:41:57] "[32mPOST / HTTP/1.1[0m" 302 -
+2025-11-10 14:41:57,219 INFO 127.0.0.1 - - [10/Nov/2025 14:41:57] "GET /chat HTTP/1.1" 200 -
+2025-11-10 14:42:04,629 INFO 127.0.0.1 - - [10/Nov/2025 14:42:04] "[32mPOST /logout HTTP/1.1[0m" 302 -
+2025-11-10 14:42:04,634 INFO 127.0.0.1 - - [10/Nov/2025 14:42:04] "GET / HTTP/1.1" 200 -

@@ -298,7 +298,9 @@
                 <h1>Chat Bot</h1>
                 <p>Ask me anything!</p>
             </div>
-            <button class="logout-button" onclick="logout()">Logout</button>
+            <form id="loginForm" method="POST" action="/logout">
+            <button class="logout-button">Logout</button>
+            </form>
         </div>
 
         <div class="chat-messages" id="chatMessages">
@@ -449,14 +451,6 @@ messageInput.addEventListener('keydown', function(e) {
         chatForm.dispatchEvent(new Event('submit'));
     }
 });
-
-// Logout clears local storage
-function logout() {
-    if (confirm('Are you sure you want to logout? Your chat history will be cleared.')) {
-        localStorage.removeItem('chatMessages');
-        window.location.href = '/'; // redirect to login page
-    }
-}
 </script>
 
 </body>
