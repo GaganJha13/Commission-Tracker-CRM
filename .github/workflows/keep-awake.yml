@@ -12,7 +12,7 @@ jobs:
       - name: Ping Render health endpoint
         run: |
           # replace with your Render URL:
-          URL="https://your-app.onrender.com/health"
+          URL="https://brandmetrics.onrender.com/"
 
           # Try up to 3 times, exit 0 if HTTP 200/301/302
           for i in 1 2 3; do
