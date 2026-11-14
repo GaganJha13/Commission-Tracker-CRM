@@ -20,10 +20,10 @@ This CRM helps sales teams track deals from closure to PTO (Permission to Operat
 ## 🖼️ Screenshots
 
 ### Login Screen
-![Login Screen](image/capture2.png)
+![Login Screen](image/capture2.PNG)
 
 ### Chatbot Interface
-![Chatbot Interface](image/capture1.png)
+![Chatbot Interface](image/capture1.PNG)
 
 ---
 
